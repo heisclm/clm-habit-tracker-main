@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useHabits } from '@/hooks/useHabits';
 import { format } from 'date-fns';
-import { Plus, Trash2, CheckCircle, Circle, Trophy, Flame, Star, LogOut, MessageSquare, Mic, Image as ImageIcon, Eye, EyeOff, BarChart3, Target, Award } from 'lucide-react';
+import { Plus, Trash2, CheckCircle, Circle, Trophy, Flame, Star, LogOut, MessageSquare, Mic, Image as ImageIcon, Eye, EyeOff, BarChart3, Target, Award, Settings as SettingsIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
 import { Chatbot } from '@/components/Chatbot';
@@ -40,6 +40,7 @@ export default function Home() {
   const [authSuccess, setAuthSuccess] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const totalHabits = habits.length;
@@ -379,7 +380,13 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <ShareModal />
-            <SettingsModal />
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-2 text-zinc-400 hover:text-violet-400 transition-all bg-white/5 hover:bg-white/10 rounded-xl border border-white/5"
+              title="System Configuration"
+            >
+              <SettingsIcon className="w-4 h-4" />
+            </button>
             <Link href="/progress" className="p-2 text-zinc-400 hover:text-cyan-400 transition-all bg-white/5 hover:bg-white/10 rounded-xl border border-white/5">
               <BarChart3 className="w-4 h-4" />
             </Link>
@@ -392,7 +399,13 @@ export default function Home() {
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-10 relative z-10">
         {/* Player Profile Section */}
-        <PlayerCard />
+        <PlayerCard onOpenSettings={() => setIsSettingsOpen(true)} />
+
+        {/* Settings Modal (Controlled) */}
+        <SettingsModal 
+          isOpen={isSettingsOpen} 
+          onClose={() => setIsSettingsOpen(false)} 
+        />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
