@@ -1,0 +1,8 @@
+{
+  "name": "CLm - Gamified Habit Tracker",
+  "description": "A gamified habit tracker that lets you earn points, build streaks, and level up while building good habits. Features an AI coach and vision board generator.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

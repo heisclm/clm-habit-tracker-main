@@ -1,0 +1,145 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the habit tracker app.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "points": {
+          "type": "number",
+          "description": "Total points earned by the user."
+        },
+        "level": {
+          "type": "number",
+          "description": "Current level of the user."
+        },
+        "currentStreak": {
+          "type": "number",
+          "description": "Current consecutive days of completing at least one habit."
+        },
+        "bestStreak": {
+          "type": "number",
+          "description": "Highest streak achieved by the user."
+        },
+        "totalHabitsCompleted": {
+          "type": "number",
+          "description": "Total number of habits completed over time."
+        },
+        "unlockedAchievements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of achievement IDs unlocked by the user."
+        },
+        "lastActiveDate": {
+          "type": "string",
+          "description": "The last date (YYYY-MM-DD) the user was active/completed a habit."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the user was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the user was last updated."
+        }
+      },
+      "required": ["uid", "points", "level", "currentStreak", "bestStreak"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "A habit created by a user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who owns this habit."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the habit."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the habit."
+        },
+        "reminderTime": {
+          "type": "string",
+          "description": "Optional time (HH:MM) to remind the user to complete the habit."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the habit was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the habit was last updated."
+        }
+      },
+      "required": ["userId", "title", "createdAt"]
+    },
+    "HabitLog": {
+      "title": "HabitLog",
+      "description": "A record of a habit being completed on a specific date.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who completed the habit."
+        },
+        "habitId": {
+          "type": "string",
+          "description": "The ID of the habit that was completed."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date (YYYY-MM-DD) the habit was completed."
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The exact timestamp when the habit was marked complete."
+        }
+      },
+      "required": ["userId", "habitId", "date", "completedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Stores user profiles and gamification stats."
+    },
+    "/habits/{habitId}": {
+      "schema": {
+        "$ref": "#/entities/Habit"
+      },
+      "description": "Stores the habits created by users."
+    },
+    "/habitLogs/{logId}": {
+      "schema": {
+        "$ref": "#/entities/HabitLog"
+      },
+      "description": "Stores the daily completion records for habits."
+    }
+  }
+}

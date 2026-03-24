@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: var(--theme-50);
+  --color-primary-100: var(--theme-100);
+  --color-primary-200: var(--theme-200);
+  --color-primary-300: var(--theme-300);
+  --color-primary-400: var(--theme-400);
+  --color-primary-500: var(--theme-500);
+  --color-primary-600: var(--theme-600);
+  --color-primary-700: var(--theme-700);
+  --color-primary-800: var(--theme-800);
+  --color-primary-900: var(--theme-900);
+  --color-primary-950: var(--theme-950);
+
+  --font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-space: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-playfair: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  /* Default to emerald */
+  --theme-50: var(--color-emerald-50);
+  --theme-100: var(--color-emerald-100);
+  --theme-200: var(--color-emerald-200);
+  --theme-300: var(--color-emerald-300);
+  --theme-400: var(--color-emerald-400);
+  --theme-500: var(--color-emerald-500);
+  --theme-600: var(--color-emerald-600);
+  --theme-700: var(--color-emerald-700);
+  --theme-800: var(--color-emerald-800);
+  --theme-900: var(--color-emerald-900);
+  --theme-950: var(--color-emerald-950);
+}
+
+.theme-emerald {
+  --theme-50: var(--color-emerald-50);
+  --theme-100: var(--color-emerald-100);
+  --theme-200: var(--color-emerald-200);
+  --theme-300: var(--color-emerald-300);
+  --theme-400: var(--color-emerald-400);
+  --theme-500: var(--color-emerald-500);
+  --theme-600: var(--color-emerald-600);
+  --theme-700: var(--color-emerald-700);
+  --theme-800: var(--color-emerald-800);
+  --theme-900: var(--color-emerald-900);
+  --theme-950: var(--color-emerald-950);
+}
+
+.theme-violet {
+  --theme-50: var(--color-violet-50);
+  --theme-100: var(--color-violet-100);
+  --theme-200: var(--color-violet-200);
+  --theme-300: var(--color-violet-300);
+  --theme-400: var(--color-violet-400);
+  --theme-500: var(--color-violet-500);
+  --theme-600: var(--color-violet-600);
+  --theme-700: var(--color-violet-700);
+  --theme-800: var(--color-violet-800);
+  --theme-900: var(--color-violet-900);
+  --theme-950: var(--color-violet-950);
+}
+
+.theme-rose {
+  --theme-50: var(--color-rose-50);
+  --theme-100: var(--color-rose-100);
+  --theme-200: var(--color-rose-200);
+  --theme-300: var(--color-rose-300);
+  --theme-400: var(--color-rose-400);
+  --theme-500: var(--color-rose-500);
+  --theme-600: var(--color-rose-600);
+  --theme-700: var(--color-rose-700);
+  --theme-800: var(--color-rose-800);
+  --theme-900: var(--color-rose-900);
+  --theme-950: var(--color-rose-950);
+}
+
+.theme-blue {
+  --theme-50: var(--color-blue-50);
+  --theme-100: var(--color-blue-100);
+  --theme-200: var(--color-blue-200);
+  --theme-300: var(--color-blue-300);
+  --theme-400: var(--color-blue-400);
+  --theme-500: var(--color-blue-500);
+  --theme-600: var(--color-blue-600);
+  --theme-700: var(--color-blue-700);
+  --theme-800: var(--color-blue-800);
+  --theme-900: var(--color-blue-900);
+  --theme-950: var(--color-blue-950);
+}
+
+.theme-amber {
+  --theme-50: var(--color-amber-50);
+  --theme-100: var(--color-amber-100);
+  --theme-200: var(--color-amber-200);
+  --theme-300: var(--color-amber-300);
+  --theme-400: var(--color-amber-400);
+  --theme-500: var(--color-amber-500);
+  --theme-600: var(--color-amber-600);
+  --theme-700: var(--color-amber-700);
+  --theme-800: var(--color-amber-800);
+  --theme-900: var(--color-amber-900);
+  --theme-950: var(--color-amber-950);
+}

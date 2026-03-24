@@ -1,0 +1,111 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid;
+    }
+
+    function userIdUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid;
+    }
+
+    function userIdNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'points', 'level', 'currentStreak', 'bestStreak', 'totalHabitsCompleted', 'unlockedAchievements', 'lastActiveDate', 'createdAt', 'updatedAt', 'themeColor', 'fontFamily']) &&
+             data.uid is string && data.uid.size() > 0 && data.uid.size() < 100 &&
+             (!('email' in data) || (data.email is string && isValidEmail(data.email) && data.email.size() < 100)) &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100)) &&
+             data.points is number && data.points >= 0 &&
+             data.level is number && data.level >= 1 &&
+             data.currentStreak is number && data.currentStreak >= 0 &&
+             data.bestStreak is number && data.bestStreak >= 0 &&
+             (!('totalHabitsCompleted' in data) || (data.totalHabitsCompleted is number && data.totalHabitsCompleted >= 0)) &&
+             (!('unlockedAchievements' in data) || data.unlockedAchievements is list) &&
+             (!('lastActiveDate' in data) || (data.lastActiveDate is string && data.lastActiveDate.size() < 20)) &&
+             (!('themeColor' in data) || (data.themeColor is string && data.themeColor.size() < 50)) &&
+             (!('fontFamily' in data) || (data.fontFamily is string && data.fontFamily.size() < 50)) &&
+             (!('createdAt' in data) || data.createdAt is timestamp) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function isValidHabit(data) {
+      return hasOnlyAllowedFields(['userId', 'title', 'description', 'reminderTime', 'createdAt', 'updatedAt']) &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             (!('description' in data) || (data.description is string && data.description.size() < 500)) &&
+             (!('reminderTime' in data) || (data.reminderTime is string && data.reminderTime.size() == 5)) &&
+             data.createdAt is timestamp &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function isValidHabitLog(data) {
+      return hasOnlyAllowedFields(['userId', 'habitId', 'date', 'completedAt']) &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
+             data.habitId is string && data.habitId.size() > 0 && data.habitId.size() < 100 &&
+             data.date is string && data.date.size() == 10 &&
+             data.completedAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && uidUnchanged();
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && uidNotModified();
+      allow delete: if false; // Users cannot delete their own profile directly for now
+    }
+
+    match /habits/{habitId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidHabit(request.resource.data) && userIdUnchanged();
+      allow update: if isDocOwner() && isValidHabit(request.resource.data) && userIdNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /habitLogs/{logId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidHabitLog(request.resource.data) && userIdUnchanged();
+      allow update: if isDocOwner() && isValidHabitLog(request.resource.data) && userIdNotModified();
+      allow delete: if isDocOwner();
+    }
+  }
+}
