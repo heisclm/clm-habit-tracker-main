@@ -210,63 +210,97 @@ export function VoiceCoach() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="p-2 text-zinc-400 hover:text-orange-400 transition-colors flex flex-col items-center gap-1 group relative"
+        className="p-2 text-zinc-500 hover:text-orange-400 transition-all flex flex-col items-center gap-1 group relative"
       >
-        <Mic className="w-5 h-5" />
-        <span className="text-[10px] font-medium uppercase tracking-wider opacity-0 group-hover:opacity-100 absolute -top-8 bg-zinc-800 px-2 py-1 rounded whitespace-nowrap">Voice Coach</span>
+        <Mic className="w-5 h-5 group-hover:scale-110 transition-transform" />
+        <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 absolute -top-10 bg-black/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-lg whitespace-nowrap transition-all shadow-2xl">Voice Coach</span>
       </button>
 
       {isOpen && mounted && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-950">
-              <h3 className="font-bold flex items-center gap-2">
-                <Mic className="w-4 h-4 text-orange-400" />
-                Live Voice Coach
-              </h3>
-              <button onClick={() => { setIsOpen(false); cleanupAudio(); }} className="text-zinc-500 hover:text-white">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-500 relative">
+            {/* Corner Accents */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-orange-500/20 rounded-tl-[2.5rem] pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-orange-500/20 rounded-br-[2.5rem] pointer-events-none"></div>
+
+            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+              <div className="space-y-0.5">
+                <h3 className="font-black text-xs uppercase tracking-widest text-white italic flex items-center gap-2">
+                  <Mic className="w-3.5 h-3.5 text-orange-500" />
+                  Voice Coach
+                </h3>
+                <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">Live Coaching</p>
+              </div>
+              <button 
+                onClick={() => { setIsOpen(false); cleanupAudio(); }} 
+                className="p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-8 flex flex-col items-center justify-center space-y-6">
-              <div className="relative">
-                <div className={`absolute inset-0 rounded-full ${isRecording ? 'bg-orange-500/20 animate-ping' : ''}`} />
+            <div className="p-10 flex flex-col items-center justify-center space-y-8">
+              <div className="relative group">
+                {/* Animated Rings */}
+                {isRecording && (
+                  <>
+                    <div className="absolute inset-0 rounded-full bg-orange-500/20 animate-ping scale-150 opacity-20" />
+                    <div className="absolute inset-0 rounded-full border border-orange-500/30 animate-pulse scale-125" />
+                  </>
+                )}
+                
                 <button
                   onClick={toggleRecording}
                   disabled={isConnecting}
-                  className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all ${
+                  className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500 ${
                     isRecording 
-                      ? 'bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.5)]' 
-                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                      ? 'bg-orange-500 text-black shadow-[0_0_40px_rgba(249,115,22,0.4)] scale-105' 
+                      : 'bg-zinc-900 border border-white/10 text-zinc-500 hover:border-orange-500/50 hover:text-orange-400'
                   }`}
                 >
                   {isConnecting ? (
-                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <Loader2 className="w-10 h-10 animate-spin" />
                   ) : isRecording ? (
-                    <Mic className="w-10 h-10" />
+                    <div className="relative">
+                      <Mic className="w-12 h-12" />
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div className="w-1 h-1 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-1 h-1 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-1 h-1 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
                   ) : (
-                    <MicOff className="w-10 h-10" />
+                    <MicOff className="w-12 h-12 opacity-50" />
                   )}
                 </button>
               </div>
 
-              <div className="text-center space-y-2">
-                <h4 className="font-bold text-lg">
-                  {isConnecting ? 'Connecting...' : isRecording ? 'Listening...' : 'Tap to start'}
-                </h4>
-                <p className="text-sm text-zinc-400">
+              <div className="text-center space-y-3">
+                <div className="flex items-center justify-center gap-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${isRecording ? 'bg-orange-500 animate-pulse' : 'bg-zinc-800'}`} />
+                  <h4 className="font-black text-sm uppercase tracking-widest text-white italic">
+                    {isConnecting ? 'Connecting...' : isRecording ? 'Link Active' : 'Standby'}
+                  </h4>
+                </div>
+                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] max-w-[200px] mx-auto leading-relaxed">
                   {isRecording 
-                    ? 'Speak naturally. The coach will reply with voice.' 
-                    : 'Get real-time motivation and advice.'}
+                    ? 'I am listening. Speak your mind.' 
+                    : 'Start a voice session for real-time support.'}
                 </p>
               </div>
 
               {error && (
-                <div className="p-3 bg-red-950/50 border border-red-900/50 rounded-xl text-red-400 text-sm text-center w-full">
-                  {error}
+                <div className="p-4 bg-red-950/30 border border-red-500/30 rounded-2xl text-red-400 text-[10px] font-mono uppercase tracking-widest text-center w-full animate-in shake duration-500">
+                  [ERROR]: {error}
                 </div>
               )}
+
+              {/* Status Bar */}
+              <div className="w-full h-px bg-white/5 relative">
+                {isRecording && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-500 to-transparent animate-shimmer" />
+                )}
+              </div>
             </div>
           </div>
         </div>,

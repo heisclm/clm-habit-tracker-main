@@ -2,6 +2,7 @@ export interface UserProfile {
   uid: string;
   email?: string;
   displayName?: string;
+  username?: string;
   points: number;
   level: number;
   currentStreak: number;
@@ -10,6 +11,7 @@ export interface UserProfile {
   unlockedAchievements?: string[];
   themeColor?: string;
   fontFamily?: string;
+  photoURL?: string;
   lastActiveDate?: string; // YYYY-MM-DD
   createdAt?: any; // Timestamp
   updatedAt?: any; // Timestamp

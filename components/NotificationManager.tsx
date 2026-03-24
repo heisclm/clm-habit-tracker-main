@@ -8,12 +8,13 @@ import { BellRing, X } from 'lucide-react';
 export function NotificationManager() {
   const { habits, logs } = useHabits();
   const notifiedHabitsRef = useRef<Set<string>>(new Set());
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [permission, setPermission] = useState<NotificationPermission>(
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default'
+  );
   const [activeToasts, setActiveToasts] = useState<{id: string, title: string}[]>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPermission(Notification.permission);
       if (Notification.permission === 'default') {
         Notification.requestPermission().then(setPermission);
       }
@@ -81,7 +82,7 @@ export function NotificationManager() {
           </div>
           <div className="flex-1">
             <h4 className="font-bold text-sm text-zinc-100">Habit Reminder</h4>
-            <p className="text-sm text-zinc-400 mt-0.5">It's time for: <span className="text-primary-300 font-medium">{toast.title}</span></p>
+            <p className="text-sm text-zinc-400 mt-0.5">It&apos;s time for: <span className="text-primary-300 font-medium">{toast.title}</span></p>
           </div>
           <button onClick={() => removeToast(toast.id)} className="text-zinc-500 hover:text-white transition-colors">
             <X className="w-4 h-4" />

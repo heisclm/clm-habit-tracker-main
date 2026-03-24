@@ -18,6 +18,10 @@
           "type": "string",
           "description": "The user's display name."
         },
+        "username": {
+          "type": "string",
+          "description": "The user's unique username."
+        },
         "points": {
           "type": "number",
           "description": "Total points earned by the user."

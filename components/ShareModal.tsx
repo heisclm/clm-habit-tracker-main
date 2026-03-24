@@ -158,7 +158,7 @@ export function ShareModal() {
 
               {/* Text Preview */}
               <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 italic">
-                "{shareText}"
+                &quot;{shareText}&quot;
               </div>
 
               {/* Actions */}

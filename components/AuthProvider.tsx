@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, sendPasswordResetEmail, verifyBeforeUpdateEmail, updatePassword } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { auth, db, googleProvider } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
@@ -13,9 +13,12 @@ interface AuthContextType {
   loading: boolean;
   signIn: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
-  signUpWithEmail: (email: string, pass: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string, displayName: string, username: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfileSettings: (settings: Partial<UserProfile>) => Promise<void>;
+  updateEmailAuth: (newEmail: string) => Promise<void>;
+  updatePasswordAuth: (newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,8 +28,11 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => {},
   signInWithEmail: async () => {},
   signUpWithEmail: async () => {},
+  resetPassword: async () => {},
   signOut: async () => {},
   updateProfileSettings: async () => {},
+  updateEmailAuth: async () => {},
+  updatePasswordAuth: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -71,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
             if (currentUser.email) newProfile.email = currentUser.email;
             if (currentUser.displayName) newProfile.displayName = currentUser.displayName;
+            if (currentUser.photoURL) newProfile.photoURL = currentUser.photoURL;
             
             await setDoc(userRef, newProfile);
             setProfile(newProfile);
@@ -94,15 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       document.documentElement.className = 'theme-emerald';
     }
-
-    if (profile?.fontFamily) {
-      document.body.classList.remove('font-inter', 'font-space', 'font-playfair', 'font-mono');
-      document.body.classList.add(`font-${profile.fontFamily}`);
-    } else {
-      document.body.classList.remove('font-inter', 'font-space', 'font-playfair', 'font-mono');
-      document.body.classList.add('font-inter');
-    }
-  }, [profile?.themeColor, profile?.fontFamily]);
+  }, [profile?.themeColor]);
 
   const signIn = async () => {
     try {
@@ -122,11 +121,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUpWithEmail = async (email: string, pass: string) => {
+  const signUpWithEmail = async (email: string, pass: string, displayName: string, username: string) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, pass);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      const newUser = userCredential.user;
+
+      // Update Firebase Auth profile
+      await updateProfile(newUser, { displayName });
+
+      // Send verification email
+      await sendEmailVerification(newUser);
+
+      // Create Firestore profile
+      const userRef = doc(db, 'users', newUser.uid);
+      const newProfile: UserProfile = {
+        uid: newUser.uid,
+        email: newUser.email || '',
+        displayName,
+        username,
+        points: 0,
+        level: 1,
+        currentStreak: 0,
+        bestStreak: 0,
+        totalHabitsCompleted: 0,
+        unlockedAchievements: [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+      await setDoc(userRef, newProfile);
+      setProfile(newProfile);
     } catch (error) {
       console.error('Error signing up with email:', error);
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      console.error('Error resetting password:', error);
       throw error;
     }
   };
@@ -143,6 +177,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     try {
       const userRef = doc(db, 'users', user.uid);
+      
+      // Update Firebase Auth profile if displayName or photoURL changed
+      if (settings.displayName || settings.photoURL) {
+        await updateProfile(user, { 
+          displayName: settings.displayName || user.displayName,
+          photoURL: settings.photoURL || user.photoURL
+        });
+      }
+
       await updateDoc(userRef, {
         ...settings,
         updatedAt: serverTimestamp(),
@@ -153,8 +196,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateEmailAuth = async (newEmail: string) => {
+    if (!user) return;
+    try {
+      await verifyBeforeUpdateEmail(user, newEmail);
+      // Also update Firestore
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        email: newEmail,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error updating email:', error);
+      throw error;
+    }
+  };
+
+  const updatePasswordAuth = async (newPassword: string) => {
+    if (!user) return;
+    try {
+      await updatePassword(user, newPassword);
+    } catch (error) {
+      console.error('Error updating password:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signInWithEmail, signUpWithEmail, signOut, updateProfileSettings }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, signInWithEmail, signUpWithEmail, resetPassword, signOut, updateProfileSettings, updateEmailAuth, updatePasswordAuth }}>
       {children}
     </AuthContext.Provider>
   );

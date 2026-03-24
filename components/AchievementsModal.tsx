@@ -19,28 +19,39 @@ export function AchievementsModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center hover:bg-zinc-800 transition-colors group"
+        className="bg-zinc-900/40 backdrop-blur-sm border border-white/5 rounded-2xl p-5 flex flex-col items-center justify-center text-center group hover:border-white/10 transition-all relative overflow-hidden"
       >
-        <Award className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
-        <span className="text-2xl font-bold">{unlockedSet.size}</span>
-        <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Badges</span>
+        <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-white/10 rounded-tl-2xl"></div>
+        <Award className="w-5 h-5 text-violet-500 mb-3 group-hover:scale-110 transition-transform" />
+        <span className="text-3xl font-black tracking-tighter text-white">{unlockedSet.size}</span>
+        <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] mt-1">Trophies</span>
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95">
-            <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-950">
-              <h3 className="font-bold flex items-center gap-2 text-purple-400">
-                <Award className="w-5 h-5" />
-                Achievements & Badges
-              </h3>
-              <button onClick={() => setIsOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-zinc-950/60 backdrop-blur-2xl border border-white/10 rounded-[3rem] shadow-[0_0_100px_rgba(139,92,246,0.1)] w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-500 relative">
+            {/* Cyber Accents */}
+            <div className="absolute top-0 left-0 w-24 h-24 border-t-2 border-l-2 border-violet-500/30 rounded-tl-[3rem] pointer-events-none"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 border-b-2 border-r-2 border-violet-500/30 rounded-br-[3rem] pointer-events-none"></div>
+
+            <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5 relative">
+              <div className="space-y-1">
+                <h3 className="font-black text-2xl uppercase tracking-tighter text-white italic flex items-center gap-3">
+                  <Trophy className="w-6 h-6 text-violet-500" />
+                  Trophy Room
+                </h3>
+                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em]">Neural Achievement Protocol</p>
+              </div>
+              <button 
+                onClick={() => setIsOpen(false)} 
+                className="p-3 text-zinc-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all border border-white/5"
+              >
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-6 max-h-[80vh] overflow-y-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="p-10 max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                 {ACHIEVEMENTS.map((achievement) => {
                   const isUnlocked = unlockedSet.has(achievement.id);
                   const IconComponent = iconMap[achievement.icon] || Award;
@@ -48,24 +59,37 @@ export function AchievementsModal() {
                   return (
                     <div 
                       key={achievement.id}
-                      className={`p-4 rounded-xl border flex flex-col items-center text-center gap-3 transition-all ${
-                        isUnlocked 
-                          ? 'bg-purple-950/20 border-purple-900/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]' 
-                          : 'bg-zinc-950/50 border-zinc-800/50 opacity-60 grayscale'
-                      }`}
+                      className="group relative flex flex-col items-center text-center gap-4"
                     >
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        isUnlocked ? 'bg-purple-500/20 text-purple-400' : 'bg-zinc-800 text-zinc-500'
+                      <div className={`relative w-20 h-20 rounded-3xl flex items-center justify-center transition-all duration-500 ${
+                        isUnlocked 
+                          ? 'bg-violet-500/20 text-violet-400 border border-violet-500/40 shadow-[0_0_30px_rgba(139,92,246,0.2)] scale-100' 
+                          : 'bg-zinc-900/40 text-zinc-700 border border-white/5 grayscale scale-95 opacity-50'
                       }`}>
-                        <IconComponent className="w-6 h-6" />
+                        {isUnlocked && (
+                          <div className="absolute inset-0 bg-violet-500/10 rounded-3xl animate-pulse blur-xl" />
+                        )}
+                        <IconComponent className={`w-10 h-10 relative z-10 ${isUnlocked ? 'animate-in zoom-in duration-700' : ''}`} />
+                        
+                        {!isUnlocked && (
+                          <div className="absolute -top-1 -right-1 bg-zinc-800 p-1.5 rounded-lg border border-white/10">
+                            <X className="w-3 h-3 text-zinc-600" />
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <h4 className={`font-bold text-sm ${isUnlocked ? 'text-zinc-100' : 'text-zinc-400'}`}>
+
+                      <div className="space-y-1.5">
+                        <h4 className={`text-[10px] font-black uppercase tracking-widest italic leading-tight ${isUnlocked ? 'text-white' : 'text-zinc-600'}`}>
                           {achievement.title}
                         </h4>
-                        <p className="text-xs text-zinc-500 mt-1">
-                          {achievement.description}
-                        </p>
+                        {isUnlocked && (
+                          <div className="h-0.5 w-4 bg-violet-500/50 mx-auto rounded-full" />
+                        )}
+                      </div>
+
+                      {/* Tooltip on Hover */}
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-40 p-2 bg-black border border-white/10 rounded-lg text-[9px] font-mono text-zinc-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-2xl">
+                        {achievement.description}
                       </div>
                     </div>
                   );

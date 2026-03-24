@@ -17,9 +17,7 @@ export function useHabits() {
     if (!user) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setHabits([]);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLogs([]);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
