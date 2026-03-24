@@ -151,8 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setDoc(userRef, newProfile);
       setProfile(newProfile);
     } catch (error) {
-      console.error('Error signing up with email:', error);
-      throw error;
+      handleFirestoreError(error, OperationType.CREATE, `users/${user?.uid || 'new_user'}`);
     }
   };
 
@@ -207,8 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updatedAt: serverTimestamp(),
       });
     } catch (error) {
-      console.error('Error updating email:', error);
-      throw error;
+      handleFirestoreError(error, OperationType.UPDATE, `users/${user.uid}`);
     }
   };
 

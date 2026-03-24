@@ -60,8 +60,18 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     setIsSaving(true);
     try {
       await updateProfileSettings({ themeColor: themeId });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      try {
+        const parsedError = JSON.parse(err.message);
+        let friendlyMessage = parsedError.error;
+        if (friendlyMessage === 'MISSING OR INSUFFICIENT PERMISSIONS.') {
+          friendlyMessage = 'Access Denied: You do not have permission to modify this record.';
+        }
+        setError(`System Error: ${friendlyMessage}`);
+      } catch {
+        setError(err.message || 'Failed to update theme.');
+      }
     }
     setIsSaving(false);
   };
@@ -112,7 +122,16 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       if (err.code === 'auth/requires-recent-login') {
         setError('Please sign out and sign back in to change sensitive info.');
       } else {
-        setError(err.message || 'Failed to update account.');
+        try {
+          const parsedError = JSON.parse(err.message);
+          let friendlyMessage = parsedError.error;
+          if (friendlyMessage === 'MISSING OR INSUFFICIENT PERMISSIONS.') {
+            friendlyMessage = 'Access Denied: You do not have permission to modify this record.';
+          }
+          setError(`System Error: ${friendlyMessage}`);
+        } catch {
+          setError(err.message || 'Failed to update account.');
+        }
       }
     } finally {
       setIsSaving(false);
