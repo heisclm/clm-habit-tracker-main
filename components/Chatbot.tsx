@@ -44,7 +44,7 @@ export function Chatbot() {
       contents.push({ role: 'user', parts: [{ text: userText }] });
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
+        model: 'gemini-2.5-flash',
         contents: contents,
         config: {
           systemInstruction: "You are an enthusiastic and supportive habit coach. Keep your answers concise, motivating, and actionable. You help users build good habits, stay consistent, and overcome procrastination."
