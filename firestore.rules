@@ -45,25 +45,32 @@ service cloud.firestore {
       return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "feraclem@gmail.com" && request.auth.token.email_verified == true));
+    }
+
     // ===============================================================
     // Domain Validators
     // ===============================================================
     function isValidUser(data) {
-      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'username', 'photoURL', 'points', 'level', 'currentStreak', 'bestStreak', 'totalHabitsCompleted', 'unlockedAchievements', 'lastActiveDate', 'createdAt', 'updatedAt', 'themeColor', 'fontFamily']) &&
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'username', 'photoURL', 'points', 'level', 'currentStreak', 'bestStreak', 'totalHabitsCompleted', 'unlockedAchievements', 'lastActiveDate', 'createdAt', 'updatedAt', 'themeColor', 'fontFamily', 'role']) &&
              data.uid is string && data.uid.size() > 0 && data.uid.size() < 100 &&
              (!('email' in data) || (data.email is string && isValidEmail(data.email) && data.email.size() < 100)) &&
              (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100)) &&
              (!('username' in data) || (data.username is string && data.username.size() >= 3 && data.username.size() < 30)) &&
              (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 2000)) &&
-             data.points is number && data.points >= 0 &&
-             data.level is number && data.level >= 1 &&
-             data.currentStreak is number && data.currentStreak >= 0 &&
-             data.bestStreak is number && data.bestStreak >= 0 &&
+             (!('points' in data) || (data.points is number && data.points >= 0)) &&
+             (!('level' in data) || (data.level is number && data.level >= 1)) &&
+             (!('currentStreak' in data) || (data.currentStreak is number && data.currentStreak >= 0)) &&
+             (!('bestStreak' in data) || (data.bestStreak is number && data.bestStreak >= 0)) &&
              (!('totalHabitsCompleted' in data) || (data.totalHabitsCompleted is number && data.totalHabitsCompleted >= 0)) &&
              (!('unlockedAchievements' in data) || data.unlockedAchievements is list) &&
              (!('lastActiveDate' in data) || (data.lastActiveDate is string && data.lastActiveDate.size() < 20)) &&
              (!('themeColor' in data) || (data.themeColor is string && data.themeColor.size() < 50)) &&
              (!('fontFamily' in data) || (data.fontFamily is string && data.fontFamily.size() < 50)) &&
+             (!('role' in data) || (data.role is string && data.role.size() < 20)) &&
              (!('createdAt' in data) || data.createdAt is timestamp) &&
              (!('updatedAt' in data) || data.updatedAt is timestamp);
     }
@@ -90,10 +97,10 @@ service cloud.firestore {
     // Rules
     // ===============================================================
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId) && isValidUser(request.resource.data) && uidUnchanged();
-      allow update: if isOwner(userId) && isValidUser(request.resource.data) && uidNotModified();
-      allow delete: if false; // Users cannot delete their own profile directly for now
+      allow update: if (isOwner(userId) || isAdmin()) && isValidUser(request.resource.data) && uidNotModified();
+      allow delete: if isAdmin();
     }
 
     match /habits/{habitId} {
