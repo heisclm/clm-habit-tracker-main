@@ -29,7 +29,7 @@ export function GoalSetter() {
       const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
       
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash',.
         contents: `I want to achieve this long-term goal: "${goalInput}". Break this down into 3 to 5 highly actionable, specific, and manageable daily habits that I can track every day.`,
         config: {
           responseMimeType: "application/json",
